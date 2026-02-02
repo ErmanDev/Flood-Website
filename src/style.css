@@ -1,0 +1,10 @@
+/* Global styles for Flood Monitoring Admin Dashboard */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure full height for v-app */
+#app {
+  height: 100vh;
+}
