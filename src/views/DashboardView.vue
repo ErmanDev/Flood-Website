@@ -286,7 +286,7 @@ const checkSensorStaleness = (status: any, currentLedStatus: any) => {
     }
   }
   
-  return { sensor: status, led: null } // unexpected case if led not passed, but we'll refactor caller
+  return { sensor: status, led: currentLedStatus }
 }
 
 const loadSensorStatus = async () => {
