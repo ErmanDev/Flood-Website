@@ -199,8 +199,9 @@ const initMap = () => {
   // Valencia City, Bukidnon coordinates: 7.9066, 125.0925
   const defaultCenter: L.LatLngExpression = [7.9066, 125.0925]
   
-  const center: L.LatLngExpression = pinnedAreas.value.length > 0 
-    ? [pinnedAreas.value[0].latitude, pinnedAreas.value[0].longitude]
+  const firstLocation = pinnedAreas.value[0]
+  const center: L.LatLngExpression = firstLocation
+    ? [firstLocation.latitude, firstLocation.longitude]
     : defaultCenter
 
   // Base Layers

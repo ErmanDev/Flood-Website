@@ -61,6 +61,7 @@
             </v-col>
           </v-row>
           <v-btn color="primary" @click="applyFilters" class="mr-2">Apply Filters</v-btn>
+          <v-btn variant="outlined" @click="clearFilters">Clear Filters</v-btn>
         
         </v-card-text>
       </v-card>
