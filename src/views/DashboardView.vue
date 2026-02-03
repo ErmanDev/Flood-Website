@@ -257,14 +257,14 @@ let healthPollInterval: number | null = null
 const POLL_INTERVAL_MS = 5000 // Poll every 5 seconds
 const OFFLINE_THRESHOLD_MS = 60000 // 1 minute timeout
 
-const checkSensorStaleness = (status: any) => {
-  if (!status) return status
+const checkSensorStaleness = (status: any, currentLedStatus: any) => {
+  if (!status) return { sensor: status, led: currentLedStatus }
   
   // If backend says it's already offline or error, respect that
-  if (status.status !== 'online') return status
+  if (status.status !== 'online') return { sensor: status, led: currentLedStatus }
   
   // If online but no lastReadingTime, it's possibly waiting for first data
-  if (!status.lastReadingTime) return status
+  if (!status.lastReadingTime) return { sensor: status, led: currentLedStatus }
 
   const lastReading = dayjs(status.lastReadingTime)
   const now = dayjs()
@@ -272,21 +272,29 @@ const checkSensorStaleness = (status: any) => {
   
   if (diff > OFFLINE_THRESHOLD_MS) {
     return {
-      ...status,
-      connected: false,
-      status: 'offline',
-      message: `Sensor offline (No data for ${Math.round(diff / 1000)}s)`
+      sensor: {
+        ...status,
+        connected: false,
+        status: 'offline',
+        message: `Sensor offline (No data for ${Math.round(diff / 1000)}s)`
+      },
+      led: {
+        color: 'grey',
+        status: 'unknown',
+        message: 'Sensor offline - LED Off'
+      }
     }
   }
   
-  return status
+  return { sensor: status, led: null } // unexpected case if led not passed, but we'll refactor caller
 }
 
 const loadSensorStatus = async () => {
   try {
     const health = await api.getHealth()
-    sensorStatus.value = checkSensorStaleness(health.sensor)
-    ledStatus.value = health.led
+    const result = checkSensorStaleness(health.sensor, health.led)
+    sensorStatus.value = result.sensor
+    ledStatus.value = result.led
   } catch (err: any) {
     console.error('Error loading sensor status:', err)
     // Don't set error state for polling failures, just log it
@@ -315,9 +323,10 @@ const loadStats = async () => {
     ])
     stats.value = dashboardStats
     stats.value = dashboardStats
-    sensorStatus.value = checkSensorStaleness(health.sensor)
-    ledStatus.value = health.led
-    ledStatus.value = health.led
+    const result = checkSensorStaleness(health.sensor, health.led)
+    sensorStatus.value = result.sensor
+    ledStatus.value = result.led
+    // ledStatus.value = health.led // This line was redundant/conflicting
     if (reading) {
       latestSensorReading.value = reading
     }
