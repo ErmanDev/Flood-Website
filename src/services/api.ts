@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { Log, PinnedLocation, SensorReading, DashboardStats, Pagination } from '@/types'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://flood-backend-7rfe.onrender.com/api'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
