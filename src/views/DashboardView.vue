@@ -255,11 +255,37 @@ const error = ref<string | null>(null)
 let healthPollInterval: number | null = null
 
 const POLL_INTERVAL_MS = 5000 // Poll every 5 seconds
+const OFFLINE_THRESHOLD_MS = 60000 // 1 minute timeout
+
+const checkSensorStaleness = (status: any) => {
+  if (!status) return status
+  
+  // If backend says it's already offline or error, respect that
+  if (status.status !== 'online') return status
+  
+  // If online but no lastReadingTime, it's possibly waiting for first data
+  if (!status.lastReadingTime) return status
+
+  const lastReading = dayjs(status.lastReadingTime)
+  const now = dayjs()
+  const diff = now.diff(lastReading, 'millisecond')
+  
+  if (diff > OFFLINE_THRESHOLD_MS) {
+    return {
+      ...status,
+      connected: false,
+      status: 'offline',
+      message: `Sensor offline (No data for ${Math.round(diff / 1000)}s)`
+    }
+  }
+  
+  return status
+}
 
 const loadSensorStatus = async () => {
   try {
     const health = await api.getHealth()
-    sensorStatus.value = health.sensor
+    sensorStatus.value = checkSensorStaleness(health.sensor)
     ledStatus.value = health.led
   } catch (err: any) {
     console.error('Error loading sensor status:', err)
@@ -288,7 +314,9 @@ const loadStats = async () => {
       api.getLatestSensorReading().catch(() => null) // Don't fail if reading fetch fails
     ])
     stats.value = dashboardStats
-    sensorStatus.value = health.sensor
+    stats.value = dashboardStats
+    sensorStatus.value = checkSensorStaleness(health.sensor)
+    ledStatus.value = health.led
     ledStatus.value = health.led
     if (reading) {
       latestSensorReading.value = reading
