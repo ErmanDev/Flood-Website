@@ -20,7 +20,21 @@
           :to="{ name: 'pinned-areas' }"
           :active="$route.name === 'pinned-areas'"
         ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-account-group"
+          title="User Management"
+          :to="{ name: 'user-management' }"
+          :active="$route.name === 'user-management'"
+        ></v-list-item>
       </v-list>
+      
+      <template v-slot:append>
+        <div class="pa-2">
+          <v-btn block color="error" @click="handleLogout" prepend-icon="mdi-logout">
+            Logout
+          </v-btn>
+        </div>
+      </template>
     </v-navigation-drawer>
 
     <v-app-bar color="primary" dark>
@@ -40,10 +54,18 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const drawer = ref(false)
 
 defineEmits<{
   refresh: []
 }>()
+
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  router.push({ name: 'login' })
+}
 </script>

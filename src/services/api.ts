@@ -1,17 +1,46 @@
 import axios from 'axios'
-import type { Log, PinnedLocation, SensorReading, DashboardStats, Pagination } from '@/types'
+import type { Log, PinnedLocation, SensorReading, DashboardStats, Pagination, User } from '@/types'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://flood-backend-7rfe.onrender.com/api'
+const AUTH_API_BASE_URL = 'https://flood-server-02ay.onrender.com/api';
+const SENSOR_API_BASE_URL = 'https://flood-backend-7rfe.onrender.com/api';
 
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+const authApiClient = axios.create({
+  baseURL: AUTH_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+const sensorApiClient = axios.create({
+  baseURL: SENSOR_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
 export const api = {
-  // Logs
+
+  // Auth
+  async login(credentials: { email: string; password: string }): Promise<any> {
+    const response = await authApiClient.post('/auth/login', credentials)
+    return response.data
+  },
+
+  async register(data: { username: string; email: string; password: string }): Promise<any> {
+    const response = await authApiClient.post('/auth/register', data)
+    return response.data
+  },
+
+  async getUsers(): Promise<User[]> {
+    const response = await authApiClient.get('/users')
+    return response.data
+  },
+
+  async updateUserStatus(id: string, status: string): Promise<User> {
+    const response = await authApiClient.put(`/users/${id}/status`, { status })
+    return response.data
+  },
+
   async getLogs(params?: {
     type?: string
     startDate?: string
@@ -19,28 +48,28 @@ export const api = {
     limit?: number
     offset?: number
   }): Promise<{ logs: Log[]; pagination: Pagination }> {
-    const response = await apiClient.get('/logs', { params })
+    const response = await sensorApiClient.get('/logs', { params })
     return response.data
   },
 
   async getLog(id: string): Promise<Log> {
-    const response = await apiClient.get(`/logs/${id}`)
+    const response = await sensorApiClient.get(`/logs/${id}`)
     return response.data
   },
 
   async clearLogs(): Promise<{ message: string; deletedCount: number }> {
-    const response = await apiClient.delete('/logs')
+    const response = await sensorApiClient.delete('/logs')
     return response.data
   },
 
   // Pinned Areas
   async getPinnedAreas(): Promise<PinnedLocation[]> {
-    const response = await apiClient.get('/pinned-areas')
+    const response = await sensorApiClient.get('/pinned-areas')
     return response.data
   },
 
   async getPinnedArea(id: string): Promise<PinnedLocation> {
-    const response = await apiClient.get(`/pinned-areas/${id}`)
+    const response = await sensorApiClient.get(`/pinned-areas/${id}`)
     return response.data
   },
 
@@ -50,12 +79,12 @@ export const api = {
     address?: string
     userId?: string
   }): Promise<PinnedLocation> {
-    const response = await apiClient.post('/pinned-areas', data)
+    const response = await sensorApiClient.post('/pinned-areas', data)
     return response.data
   },
 
   async deletePinnedArea(id: string): Promise<void> {
-    await apiClient.delete(`/pinned-areas/${id}`)
+    await sensorApiClient.delete(`/pinned-areas/${id}`)
   },
 
   // Sensor Readings
@@ -65,18 +94,18 @@ export const api = {
     limit?: number
     offset?: number
   }): Promise<{ readings: SensorReading[]; pagination: Pagination }> {
-    const response = await apiClient.get('/sensor-readings', { params })
+    const response = await sensorApiClient.get('/sensor-readings', { params })
     return response.data
   },
 
   async getLatestSensorReading(): Promise<SensorReading> {
-    const response = await apiClient.get('/sensor-readings/latest')
+    const response = await sensorApiClient.get('/sensor-readings/latest')
     return response.data
   },
 
   // Dashboard
   async getDashboardStats(): Promise<DashboardStats> {
-    const response = await apiClient.get('/dashboard/stats')
+    const response = await sensorApiClient.get('/dashboard/stats')
     return response.data
   },
 
@@ -98,7 +127,7 @@ export const api = {
       message: string
     }
   }> {
-    const response = await apiClient.get('/health')
+    const response = await sensorApiClient.get('/health')
     return response.data
   },
 }

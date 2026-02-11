@@ -322,7 +322,6 @@ const loadStats = async () => {
       api.getLatestSensorReading().catch(() => null) // Don't fail if reading fetch fails
     ])
     stats.value = dashboardStats
-    stats.value = dashboardStats
     const result = checkSensorStaleness(health.sensor, health.led)
     sensorStatus.value = result.sensor
     ledStatus.value = result.led

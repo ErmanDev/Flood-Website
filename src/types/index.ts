@@ -58,3 +58,15 @@ export interface Pagination {
   offset: number
   hasMore: boolean
 }
+
+export interface User {
+  _id: string
+  username: string
+  email: string
+  firstName: string
+  lastName: string
+  phone: string
+  address: string
+  profileImage: string
+  status: 'Verified' | 'Pending Verification' | 'Rejected'
+}
