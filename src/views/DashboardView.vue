@@ -254,16 +254,14 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 let healthPollInterval: number | null = null
 
-const POLL_INTERVAL_MS = 5000 // Poll every 5 seconds
-const OFFLINE_THRESHOLD_MS = 60000 // 1 minute timeout
+const POLL_INTERVAL_MS = 5000 
+const OFFLINE_THRESHOLD_MS = 60000 
 
 const checkSensorStaleness = (status: any, currentLedStatus: any) => {
   if (!status) return { sensor: status, led: currentLedStatus }
   
-  // If backend says it's already offline or error, respect that
   if (status.status !== 'online') return { sensor: status, led: currentLedStatus }
   
-  // If online but no lastReadingTime, it's possibly waiting for first data
   if (!status.lastReadingTime) return { sensor: status, led: currentLedStatus }
 
   const lastReading = dayjs(status.lastReadingTime)
@@ -297,7 +295,6 @@ const loadSensorStatus = async () => {
     ledStatus.value = result.led
   } catch (err: any) {
     console.error('Error loading sensor status:', err)
-    // Don't set error state for polling failures, just log it
   }
 }
 
@@ -307,7 +304,6 @@ const loadLatestSensorReading = async () => {
     latestSensorReading.value = reading
   } catch (err: any) {
     console.error('Error loading latest sensor reading:', err)
-    // Don't set error state for polling failures, just log it
   }
 }
 
@@ -315,17 +311,15 @@ const loadStats = async () => {
   loading.value = true
   error.value = null
   try {
-    // Fetch dashboard stats, health status, and latest reading in parallel
     const [dashboardStats, health, reading] = await Promise.all([
       api.getDashboardStats(),
       api.getHealth(),
-      api.getLatestSensorReading().catch(() => null) // Don't fail if reading fetch fails
+      api.getLatestSensorReading().catch(() => null) 
     ])
     stats.value = dashboardStats
     const result = checkSensorStaleness(health.sensor, health.led)
     sensorStatus.value = result.sensor
     ledStatus.value = result.led
-    // ledStatus.value = health.led // This line was redundant/conflicting
     if (reading) {
       latestSensorReading.value = reading
     }

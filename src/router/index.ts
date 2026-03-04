@@ -23,19 +23,22 @@ const router = createRouter({
       path: '/logs',
       name: 'logs',
       component: LogsView,
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/pinned-areas',
       name: 'pinned-areas',
       component: PinnedAreasView,
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/user-management',
       name: 'user-management',
       component: UserManagementView,
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
+    }, {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
     }
    
   ],
