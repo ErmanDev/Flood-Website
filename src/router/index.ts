@@ -9,15 +9,15 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/login',
-      name: 'login',
-      component: LoginView,
-    },
-    {
       path: '/',
       name: 'dashboard',
       component: DashboardView,
-      meta: { requiresAuth: true }
+      
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView,
     },
     {
       path: '/logs',
@@ -37,6 +37,7 @@ const router = createRouter({
       component: UserManagementView,
       meta: { requiresAuth: true }
     }
+   
   ],
 })
 
